@@ -20,4 +20,18 @@ class Controller extends BaseController
     {
         Alert::error('Error', $message);
     }
+
+    public function validatePhone($phone)
+    {
+        if (strpos($phone, '0') === 0 && strlen($phone) == 10) {
+            $nphone = "+254" . substr($phone, 1);
+        } elseif (strpos($phone, '+') === 0 && strlen($phone) == 13) {
+            $nphone = $phone;
+        } elseif (strpos($phone, '2') === 0 && strlen($phone) == 12) {
+            $nphone = "+" . $phone;
+        } else {
+            $nphone = false;
+        }
+        return $nphone;
+    }
 }
