@@ -73,12 +73,12 @@ class AppController extends Controller
         if ($type != null) {
             $report = new Report();
             $report->description = $request->description;
-            $report->disastertype_id = $type->iid;
+            $report->disastertype_id = $type->id;
             $report->user_id = Auth::user()->id;
             $filename = time() . '.' . $request->data->getClientOriginalExtension();
-            $request->certificate->move(public_path('/assets/data/'), $filename);
+            $request->data->move(public_path('/assets/data/'), $filename);
             $report->files = $filename;
-            $report->coodinates = $request->coordinates;
+            $report->coordinates = $request->coordinates;
             $report->save();
 
             return responder()->success($report);

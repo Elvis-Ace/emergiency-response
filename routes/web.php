@@ -25,6 +25,9 @@ Route::prefix('dashboard')->group(function () {
         Route::get('heatmap', 'heatmap')->name('heatmap');
         Route::get('disaster-types', 'types')->name('disaster.types');
         Route::post('add-type', 'addtype')->name('add.type');
+        Route::get('reports', 'reports')->name('reports');
+        Route::get('notifications', 'notifications')->name('notifications');
+        Route::post('notify', 'notifify')->name('notify');
     });
 });
 

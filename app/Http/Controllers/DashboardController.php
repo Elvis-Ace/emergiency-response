@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Disastertype;
+use App\Models\Report;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -47,6 +49,37 @@ class DashboardController extends Controller
             $this->error("Type Already Exists");
         }
 
+        return redirect()->back();
+    }
+
+    public function reports()
+    {
+        $data = [
+            'title' => "Reports",
+            'reports' => Report::all(),
+            'types' => Disastertype::all()
+        ];
+
+        return view('dashboard.reports', $data);
+    }
+
+
+    public function notifications()
+    {
+        $data = [
+            'title' => "Notify People",
+        ];
+
+        return view('dashboard.notification', $data);
+    }
+
+    public function notify(Request $request)
+    {
+        $users = User::all();
+        foreach ($users as $user) {
+            $this->SendMessage($user->phone, $request->message);
+        }
+        $this->success("Message Sent Successful");
         return redirect()->back();
     }
 }

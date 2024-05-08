@@ -24,5 +24,5 @@ Route::controller(AppController::class)->group(function () {
     Route::post('login', 'login');
     Route::get('types', 'disastertypes');
     Route::get('reports', 'reports');
-    Route::post('post-report', 'addreport');
+    Route::post('post-report', 'addreport')->middleware('auth:sanctum');
 });
