@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AppController extends Controller
 {
@@ -20,6 +21,7 @@ class AppController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
+            $user->role = "user";
             $user->password = Hash::make($request->password);
             $user->save();
             return responder()->success($user);
@@ -31,21 +33,26 @@ class AppController extends Controller
 
     public function login(Request $request)
     {
-        $login = $request->email;
-        $login = request()->input('data');
-
-        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        request()->merge([$fieldType => $login]);
-        $data = filter_var($login, FILTER_VALIDATE_EMAIL) ? $request->data : $this->validatePhone($request->data);
-
-        $cr = [$fieldType => $data, 'password' => $request->password];
-        if (!Auth::attempt($cr)) {
-            return responder()->error(401, 'Credentials Dont Match');
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'min:7'],
+            'password' => ['required', 'string'],
+        ]);
+        if ($validator->fails()) {
+            return responder()->error(403, $validator->messages()->first())->respond(403);
         }
-        $user = User::where($fieldType, $data)->first();
+        $email = $request->email;
+        $password = $request->password;
+        $cr = ['email' => $email, 'password' => $password];
+
+        $user = User::where('email', $email)->first();
+        if (!$user || !Hash::check($password, $user->password)) {
+            return responder()->error(403, 'Invalid Credentials')->respond(403);
+        }
+        $token = $user->createToken('Api Token of ' . $user->email);
+
         return responder()->success([
             'user' => $user,
-            'token' => $user->createToken('Api Token of ' . $user->name)
+            'token' => $token->plainTextToken
         ]);
     }
     public function disastertypes()
